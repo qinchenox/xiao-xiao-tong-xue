@@ -1,0 +1,1171 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>微信聊天机器人</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif;
+            background-color: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-image: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            padding: 0;
+        }
+        
+        .wechat-container {
+            width: 420px;
+            height: 680px;
+            background-color: #ffffff;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15), 0 0 0 1px rgba(255,255,255,0.1) inset;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+        
+        .wechat-container:hover {
+            box-shadow: 0 15px 50px rgba(0,0,0,0.2), 0 0 0 1px rgba(255,255,255,0.1) inset;
+            transform: translateY(-2px);
+        }
+        
+        .wechat-header {
+            background: linear-gradient(135deg, #07C160 0%, #05AE53 100%);
+            color: white;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .wechat-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            animation: shine 3s infinite;
+        }
+        
+        @keyframes shine {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+        
+        .wechat-header .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .wechat-header .bot-avatar {
+            font-size: 28px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .wechat-header .header-info {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        
+        .wechat-header h2 {
+            font-size: 18px;
+            font-weight: 600;
+            margin: 0;
+        }
+        
+        .wechat-header .status {
+            display: flex;
+            align-items: center;
+            font-size: 12px;
+            gap: 6px;
+        }
+        
+        .wechat-header .status-dot {
+            width: 8px;
+            height: 8px;
+            background-color: #FFFFFF;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+        
+        .wechat-header .header-right {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .wechat-header .header-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            border-radius: 8px;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .wechat-header .header-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        .wechat-header .header-btn:active {
+            transform: translateY(0);
+        }
+        
+        @keyframes pulse {
+            0% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 0.7;
+                transform: scale(1.1);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+        
+        .wechat-body {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background-color: #F5F5F5;
+            background-image: url('data:image/svg+xml;charset=utf-8,%3Csvg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"%3E%3Cpath d="M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z" fill="%23c0c0c0" fill-opacity="0.1" fill-rule="evenodd"/%3E%3C/svg%3E');
+        }
+        
+        .wechat-body::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .wechat-body::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 3px;
+        }
+        
+        .wechat-body::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 3px;
+        }
+        
+        .wechat-body::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+        
+        .message {
+            margin-bottom: 20px;
+            max-width: 78%;
+            padding: 14px 18px;
+            border-radius: 20px;
+            position: relative;
+            font-size: 15px;
+            line-height: 1.45;
+            word-wrap: break-word;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            animation: messageSlide 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        @keyframes messageSlide {
+            from {
+                opacity: 0;
+                transform: translateY(15px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+        
+        .message.user {
+            background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+            align-self: flex-start;
+            border-bottom-left-radius: 8px;
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+        
+        .message.bot {
+            background: linear-gradient(135deg, #95EC69 0%, #83e45a 100%);
+            align-self: flex-end;
+            margin-left: auto;
+            border-bottom-right-radius: 8px;
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+        
+        .message::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+        }
+        
+        .message.user::before {
+            background: linear-gradient(90deg, transparent, rgba(0,0,0,0.05), transparent);
+        }
+        
+        .message-time {
+            font-size: 11px;
+            color: #999;
+            margin-top: 6px;
+            text-align: right;
+            opacity: 0.8;
+        }
+        
+        .wechat-footer {
+            padding: 18px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+            border-top: 1px solid rgba(0,0,0,0.08);
+            display: flex;
+            align-items: center;
+            box-shadow: 0 -4px 16px rgba(0,0,0,0.05);
+            position: relative;
+        }
+        
+        .wechat-footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(0,0,0,0.08), transparent);
+        }
+        
+        .wechat-input {
+            flex: 1;
+            padding: 14px 18px;
+            border: 1px solid rgba(0,0,0,0.1);
+            border-radius: 24px;
+            outline: none;
+            margin-right: 14px;
+            font-size: 15px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: linear-gradient(135deg, #ffffff 0%, #f9f9f9 100%);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05) inset;
+        }
+        
+        .wechat-input:focus {
+            border-color: #07C160;
+            box-shadow: 0 0 0 3px rgba(7, 193, 96, 0.1), 0 2px 4px rgba(0,0,0,0.05) inset;
+            background: white;
+            transform: scale(1.01);
+        }
+        
+        .wechat-send {
+            background: linear-gradient(135deg, #07C160 0%, #05AE53 100%);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 48px;
+            height: 48px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 12px rgba(7, 193, 96, 0.4);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .wechat-send:hover {
+            background: linear-gradient(135deg, #05AE53 0%, #049a48 100%);
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 6px 16px rgba(7, 193, 96, 0.5);
+        }
+        
+        .wechat-send:active {
+            transform: translateY(0) scale(0.98);
+        }
+        
+        .wechat-send::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: shine 2s infinite;
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            border: 3px solid rgba(0,0,0,0.1);
+            border-radius: 50%;
+            border-top-color: #07C160;
+            animation: spin 1s ease-in-out infinite;
+            box-shadow: 0 0 10px rgba(7, 193, 96, 0.2);
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .welcome-message {
+            text-align: center;
+            margin: 25px 0;
+            padding: 20px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(248, 249, 250, 0.9) 100%);
+            border-radius: 16px;
+            font-size: 15px;
+            color: #666;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .typing-indicator {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 10px 15px;
+        }
+        
+        .typing-indicator span {
+            width: 10px;
+            height: 10px;
+            background: linear-gradient(135deg, #07C160 0%, #05AE53 100%);
+            border-radius: 50%;
+            animation: typing 1.4s infinite ease-in-out both;
+            box-shadow: 0 2px 4px rgba(7, 193, 96, 0.3);
+        }
+        
+        .typing-indicator span:nth-child(1) {
+            animation-delay: -0.32s;
+        }
+        
+        .typing-indicator span:nth-child(2) {
+            animation-delay: -0.16s;
+        }
+        
+        @keyframes typing {
+            0%, 80%, 100% {
+                transform: scale(0);
+                opacity: 0.5;
+            }
+            40% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+        
+        /* 消息时间样式优化 */
+        .message-time {
+            font-size: 11px;
+            color: rgba(153, 153, 153, 0.8);
+            margin-top: 8px;
+            text-align: right;
+            opacity: 0.8;
+            transition: opacity 0.3s ease;
+        }
+        
+        .message:hover .message-time {
+            opacity: 1;
+        }
+        
+        /* 滚动条优化 */
+        .wechat-body::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .wechat-body::-webkit-scrollbar-track {
+            background: rgba(0,0,0,0.05);
+            border-radius: 4px;
+        }
+        
+        .wechat-body::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #07C160 0%, #05AE53 100%);
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+        
+        .wechat-body::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, #05AE53 0%, #049a48 100%);
+            transform: scale(1.1);
+        }
+        
+        /* 移动端响应式设计 */
+        @media (max-width: 480px) {
+            body {
+                background-image: linear-gradient(135deg, #07C160 0%, #05AE53 100%);
+                overflow: hidden;
+            }
+            
+            .wechat-container {
+                width: 100%;
+                height: 100vh;
+                border-radius: 0;
+                box-shadow: none;
+            }
+            
+            .wechat-header {
+                padding: 15px;
+            }
+            
+            .wechat-header .bot-avatar {
+                font-size: 24px;
+                width: 36px;
+                height: 36px;
+            }
+            
+            .wechat-header h2 {
+                font-size: 16px;
+            }
+            
+            .wechat-header .header-btn {
+                width: 32px;
+                height: 32px;
+                font-size: 14px;
+            }
+            
+            .wechat-body {
+                padding: 12px;
+            }
+            
+            .message {
+                margin-bottom: 15px;
+                padding: 12px 14px;
+                font-size: 14px;
+            }
+            
+            .wechat-footer {
+                padding: 12px;
+            }
+            
+            .wechat-input {
+                padding: 12px 14px;
+                font-size: 14px;
+                margin-right: 10px;
+            }
+            
+            .wechat-send {
+                width: 42px;
+                height: 42px;
+                font-size: 16px;
+            }
+        }
+        
+        /* 平板响应式设计 */
+        @media (min-width: 481px) and (max-width: 768px) {
+            .wechat-container {
+                width: 90%;
+                height: 85vh;
+            }
+        }
+        
+        /* 触摸设备优化 */
+        @media (hover: none) and (pointer: coarse) {
+            .wechat-header .header-btn:hover {
+                background: rgba(255, 255, 255, 0.2);
+                transform: none;
+                box-shadow: none;
+            }
+            
+            .wechat-header .header-btn:active {
+                background: rgba(255, 255, 255, 0.3);
+                transform: scale(0.95);
+            }
+            
+            .wechat-send:hover {
+                transform: none;
+            }
+            
+            .wechat-send:active {
+                transform: scale(0.95);
+            }
+        }
+        
+        /* 工具面板样式 */
+        .wechat-tools {
+            background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+            border-top: 1px solid rgba(0,0,0,0.08);
+            border-bottom: 1px solid rgba(0,0,0,0.08);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+        
+        .wechat-tools::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(0,0,0,0.08), transparent);
+        }
+        
+        .tools-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .tools-header:hover {
+            background: rgba(0,0,0,0.02);
+        }
+        
+        .tools-header h3 {
+            font-size: 14px;
+            font-weight: 600;
+            color: #666;
+            margin: 0;
+        }
+        
+        .tools-toggle {
+            background: none;
+            border: none;
+            font-size: 12px;
+            color: #999;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            padding: 4px;
+            border-radius: 4px;
+        }
+        
+        .tools-toggle:hover {
+            background: rgba(0,0,0,0.05);
+            color: #666;
+        }
+        
+        .tools-content {
+            padding: 10px 15px;
+            max-height: 200px;
+            overflow-y: auto;
+            animation: slideDown 0.3s ease-out;
+        }
+        
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                max-height: 0;
+            }
+            to {
+                opacity: 1;
+                max-height: 200px;
+            }
+        }
+        
+        .tool-category {
+            margin-bottom: 15px;
+        }
+        
+        .tool-category h4 {
+            font-size: 12px;
+            font-weight: 600;
+            color: #999;
+            margin: 0 0 8px 0;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .tool-btn {
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            border: 1px solid rgba(0,0,0,0.1);
+            border-radius: 8px;
+            padding: 8px 12px;
+            margin-right: 8px;
+            margin-bottom: 8px;
+            font-size: 12px;
+            color: #666;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        
+        .tool-btn:hover {
+            background: linear-gradient(135deg, #07C160 0%, #05AE53 100%);
+            color: white;
+            border-color: #07C160;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(7, 193, 96, 0.3);
+        }
+        
+        .tool-btn:active {
+            transform: translateY(0);
+        }
+        
+        /* 工具结果显示样式 */
+        .tool-result {
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            border: 1px solid #bae6fd;
+            border-radius: 12px;
+            padding: 12px;
+            margin-top: 8px;
+            font-size: 13px;
+            line-height: 1.4;
+            color: #0369a1;
+            box-shadow: 0 2px 4px rgba(59, 130, 246, 0.1);
+        }
+        
+        .tool-result h5 {
+            font-size: 12px;
+            font-weight: 600;
+            margin: 0 0 8px 0;
+            color: #0284c7;
+        }
+        
+        .tool-result pre {
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 6px;
+            padding: 8px;
+            font-size: 11px;
+            overflow-x: auto;
+            margin: 8px 0 0 0;
+        }
+        
+        /* 工具面板响应式设计 */
+        @media (max-width: 480px) {
+            .wechat-tools {
+                order: 2;
+            }
+            
+            .tools-content {
+                max-height: 150px;
+                padding: 8px 12px;
+            }
+            
+            .tool-btn {
+                padding: 6px 10px;
+                font-size: 11px;
+                margin-right: 6px;
+                margin-bottom: 6px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="wechat-container">
+        <div class="wechat-header">
+            <div class="header-left">
+                <div class="bot-avatar">🤖</div>
+                <div class="header-info">
+                    <h2>小小同学</h2>
+                    <div class="status">
+                        <div class="status-dot"></div>
+                        <span>在线</span>
+                    </div>
+                </div>
+            </div>
+            <div class="header-right">
+                <button class="header-btn" title="历史记录">📋</button>
+                <button class="header-btn" title="新对话框">➕</button>
+                <button class="header-btn" title="设置">⚙️</button>
+            </div>
+        </div>
+        
+        <div class="wechat-body" id="chat-body">
+            <div class="message bot">
+                你好！我是微信机器人，有什么可以帮助你的？
+            </div>
+        </div>
+        
+        <div class="wechat-tools" id="tools-panel">
+            <div class="tools-header">
+                <h3>工具</h3>
+                <button class="tools-toggle" id="tools-toggle">▼</button>
+            </div>
+            <div class="tools-content" id="tools-content">
+                <div class="tool-category">
+                    <h4>⏰ 时间工具</h4>
+                    <button class="tool-btn" data-tool="current_time">获取当前时间</button>
+                    <button class="tool-btn" data-tool="timezone_conversion">时区转换</button>
+                    <button class="tool-btn" data-tool="weekday">星期几计算</button>
+                    <button class="tool-btn" data-tool="timestamp_conversion">时间戳转换</button>
+                </div>
+                <div class="tool-category">
+                    <h4>📋 GitHub 工具</h4>
+                    <button class="tool-btn" data-tool="github_repos">仓库搜索</button>
+                    <button class="tool-btn" data-tool="github_issues">Issues 管理</button>
+                </div>
+                <div class="tool-category">
+                    <h4>🌐 网页工具</h4>
+                    <button class="tool-btn" data-tool="webscraper">网页爬虫</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="wechat-footer">
+            <input type="text" class="wechat-input" id="message-input" placeholder="输入消息...">
+            <button class="wechat-send" id="send-btn">发送</button>
+        </div>
+    </div>
+    
+    <script>
+        // 微信机器人核心逻辑
+        class WeChatBot {
+            constructor() {
+                this.messages = [];
+                this.chatBody = document.getElementById('chat-body');
+                this.messageInput = document.getElementById('message-input');
+                this.sendBtn = document.getElementById('send-btn');
+                
+                this.initEventListeners();
+            }
+            
+            initEventListeners() {
+                // 发送按钮点击事件
+                this.sendBtn.addEventListener('click', () => {
+                    this.sendMessage();
+                });
+                
+                // 输入框回车事件
+                this.messageInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        this.sendMessage();
+                    }
+                });
+                
+                // 头部按钮事件
+                const historyBtn = document.querySelector('[title="历史记录"]');
+                const newChatBtn = document.querySelector('[title="新对话框"]');
+                const settingsBtn = document.querySelector('[title="设置"]');
+                
+                if (historyBtn) {
+                    historyBtn.addEventListener('click', () => {
+                        this.showHistory();
+                    });
+                }
+                
+                if (newChatBtn) {
+                    newChatBtn.addEventListener('click', () => {
+                        this.newChat();
+                    });
+                }
+                
+                if (settingsBtn) {
+                    settingsBtn.addEventListener('click', () => {
+                        this.showSettings();
+                    });
+                }
+                
+                // 工具面板事件
+                const toolsToggle = document.getElementById('tools-toggle');
+                const toolsContent = document.getElementById('tools-content');
+                
+                if (toolsToggle && toolsContent) {
+                    toolsToggle.addEventListener('click', () => {
+                        const isVisible = toolsContent.style.display !== 'none';
+                        if (isVisible) {
+                            toolsContent.style.display = 'none';
+                            toolsToggle.textContent = '▶';
+                        } else {
+                            toolsContent.style.display = 'block';
+                            toolsToggle.textContent = '▼';
+                        }
+                    });
+                }
+                
+                // 工具按钮事件
+                const toolBtns = document.querySelectorAll('.tool-btn');
+                toolBtns.forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const toolName = btn.dataset.tool;
+                        this.useTool(toolName);
+                    });
+                });
+            }
+            
+            async useTool(toolName) {
+                // 显示加载状态
+                const loadingId = this.addLoading();
+                
+                try {
+                    // 调用后端工具 API
+                    const response = await fetch('http://localhost:3001/api/tools/call', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            tool_name: toolName,
+                            params: {}
+                        })
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error('API 调用失败');
+                    }
+                    
+                    const result = await response.json();
+                    this.removeLoading(loadingId);
+                    
+                    if (result.success) {
+                        // 显示工具调用结果
+                        this.addToolResult(toolName, result.data);
+                    } else {
+                        this.addMessage(`工具调用失败: ${result.error}`, 'bot');
+                    }
+                } catch (error) {
+                    console.error('工具调用错误:', error);
+                    this.removeLoading(loadingId);
+                    
+                    // 降级到本地工具实现
+                    const localResult = await this.getLocalToolResult(toolName);
+                    if (localResult.success) {
+                        this.addToolResult(toolName, localResult.data);
+                    } else {
+                        this.addMessage(`工具调用错误: ${error.message}`, 'bot');
+                    }
+                }
+            }
+            
+            // 本地工具实现（降级使用）
+            async getLocalToolResult(toolName) {
+                try {
+                    switch (toolName) {
+                        case 'current_time':
+                            return await this.getCurrentTime();
+                        case 'timezone_conversion':
+                            return await this.getTimezoneConversion();
+                        case 'weekday':
+                            return await this.getWeekday();
+                        case 'timestamp_conversion':
+                            return await this.getTimestampConversion();
+                        case 'github_repos':
+                            return await this.getGitHubRepos();
+                        case 'github_issues':
+                            return await this.getGitHubIssues();
+                        case 'webscraper':
+                            return await this.getWebScraper();
+                        default:
+                            return { success: false, error: '工具未实现' };
+                    }
+                } catch (error) {
+                    return { success: false, error: error.message };
+                }
+            }
+            
+            addToolResult(toolName, data) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = 'message bot';
+                
+                let toolLabel, toolResult;
+                
+                switch (toolName) {
+                    case 'current_time':
+                        toolLabel = '⏰ 当前时间';
+                        toolResult = `<div class="tool-result"><h5>${toolLabel}</h5><p>${data}</p></div>`;
+                        break;
+                    case 'timezone_conversion':
+                        toolLabel = '🌍 时区转换';
+                        toolResult = `<div class="tool-result"><h5>${toolLabel}</h5><p>${data}</p></div>`;
+                        break;
+                    case 'weekday':
+                        toolLabel = '📅 星期几计算';
+                        toolResult = `<div class="tool-result"><h5>${toolLabel}</h5><p>${data}</p></div>`;
+                        break;
+                    case 'timestamp_conversion':
+                        toolLabel = '⏱️ 时间戳转换';
+                        toolResult = `<div class="tool-result"><h5>${toolLabel}</h5><p>${data}</p></div>`;
+                        break;
+                    case 'github_repos':
+                        toolLabel = '📋 GitHub 仓库';
+                        toolResult = `<div class="tool-result"><h5>${toolLabel}</h5><pre>${data}</pre></div>`;
+                        break;
+                    case 'github_issues':
+                        toolLabel = '🐛 GitHub Issues';
+                        toolResult = `<div class="tool-result"><h5>${toolLabel}</h5><pre>${data}</pre></div>`;
+                        break;
+                    case 'webscraper':
+                        toolLabel = '🌐 网页内容';
+                        toolResult = `<div class="tool-result"><h5>${toolLabel}</h5><pre>${data}</pre></div>`;
+                        break;
+                    default:
+                        toolLabel = '工具结果';
+                        toolResult = `<div class="tool-result"><h5>${toolLabel}</h5><p>${data}</p></div>`;
+                }
+                
+                messageDiv.innerHTML = toolResult;
+                this.chatBody.appendChild(messageDiv);
+                this.chatBody.scrollTop = this.chatBody.scrollHeight;
+            }
+            
+            // 时间工具实现
+            async getCurrentTime() {
+                try {
+                    const now = new Date();
+                    const formattedTime = now.toLocaleString('zh-CN', {
+                        year: 'numeric',
+                        month: '2-digit',
+                        day: '2-digit',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        second: '2-digit',
+                        hour12: false
+                    });
+                    return { success: true, data: formattedTime };
+                } catch (error) {
+                    return { success: false, error: error.message };
+                }
+            }
+            
+            async getTimezoneConversion() {
+                try {
+                    const now = new Date();
+                    const localTime = now.toLocaleString('zh-CN');
+                    const utcTime = now.toUTCString();
+                    return { success: true, data: `本地时间: ${localTime}\nUTC时间: ${utcTime}` };
+                } catch (error) {
+                    return { success: false, error: error.message };
+                }
+            }
+            
+            async getWeekday() {
+                try {
+                    const now = new Date();
+                    const weekdays = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
+                    const weekday = weekdays[now.getDay()];
+                    const date = now.toLocaleDateString('zh-CN');
+                    return { success: true, data: `${date} ${weekday}` };
+                } catch (error) {
+                    return { success: false, error: error.message };
+                }
+            }
+            
+            async getTimestampConversion() {
+                try {
+                    const now = new Date();
+                    const timestamp = now.getTime();
+                    const date = now.toLocaleString('zh-CN');
+                    return { success: true, data: `当前时间: ${date}\n时间戳: ${timestamp}` };
+                } catch (error) {
+                    return { success: false, error: error.message };
+                }
+            }
+            
+            // GitHub 工具实现（模拟）
+            async getGitHubRepos() {
+                try {
+                    return { success: true, data: 'GitHub 仓库搜索功能开发中...' };
+                } catch (error) {
+                    return { success: false, error: error.message };
+                }
+            }
+            
+            async getGitHubIssues() {
+                try {
+                    return { success: true, data: 'GitHub Issues 功能开发中...' };
+                } catch (error) {
+                    return { success: false, error: error.message };
+                }
+            }
+            
+            // 网页爬虫实现（模拟）
+            async getWebScraper() {
+                try {
+                    return { success: true, data: '网页爬虫功能开发中...' };
+                } catch (error) {
+                    return { success: false, error: error.message };
+                }
+            }
+            
+            showHistory() {
+                // 显示历史记录
+                alert('历史记录功能开发中，敬请期待！');
+            }
+            
+            newChat() {
+                // 新对话框
+                if (confirm('确定要开始新的对话吗？当前对话内容将会被清空。')) {
+                    this.clearChat();
+                    this.addMessage('你好！我是智能微信机器人，有什么可以帮助你的？', 'bot');
+                }
+            }
+            
+            clearChat() {
+                // 清空聊天记录
+                this.chatBody.innerHTML = '';
+                this.messages = [];
+            }
+            
+            showSettings() {
+                // 显示设置
+                alert('设置功能开发中，敬请期待！');
+            }
+            
+            async sendMessage() {
+                const message = this.messageInput.value.trim();
+                if (!message) return;
+                
+                // 添加用户消息
+                this.addMessage(message, 'user');
+                this.messageInput.value = '';
+                
+                // 模拟机器人思考
+                const loadingId = this.addLoading();
+                
+                try {
+                    // 调用智能回复
+                    const reply = await this.getReply(message);
+                    this.removeLoading(loadingId);
+                    this.addMessage(reply, 'bot');
+                } catch (error) {
+                    console.error('发送消息错误:', error);
+                    this.removeLoading(loadingId);
+                    this.addMessage('抱歉，我暂时无法回复你的消息，请稍后再试。', 'bot');
+                }
+            }
+            
+            addMessage(text, type) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message ${type}`;
+                messageDiv.textContent = text;
+                this.chatBody.appendChild(messageDiv);
+                this.chatBody.scrollTop = this.chatBody.scrollHeight;
+            }
+            
+            addLoading() {
+                const loadingDiv = document.createElement('div');
+                loadingDiv.className = 'message bot';
+                loadingDiv.id = 'loading-' + Date.now();
+                loadingDiv.innerHTML = '<div class="typing-indicator"><span></span><span></span><span></span></div>';
+                this.chatBody.appendChild(loadingDiv);
+                this.chatBody.scrollTop = this.chatBody.scrollHeight;
+                return loadingDiv.id;
+            }
+            
+            removeLoading(id) {
+                const loadingDiv = document.getElementById(id);
+                if (loadingDiv) {
+                    loadingDiv.remove();
+                }
+            }
+            
+            async getReply(message) {
+                try {
+                    // 直接调用 DeepSeek API 获取智能回复
+                    const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': 'Bearer sk-1a9f7c3642e34f5688f4ec040333a368'
+                        },
+                        body: JSON.stringify({
+                            model: 'deepseek-chat',
+                            messages: [
+                                {
+                                    role: 'system',
+                                    content: '你是一个智能微信机器人，友好、幽默、乐于助人。请用自然的中文回复用户的问题，保持对话流畅有趣。'
+                                },
+                                {
+                                    role: 'user',
+                                    content: message
+                                }
+                            ],
+                            temperature: 0.7,
+                            max_tokens: 1000,
+                            stream: false
+                        })
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error('API 调用失败');
+                    }
+                    
+                    const data = await response.json();
+                    return data.choices[0].message.content || '抱歉，我暂时无法回答这个问题。';
+                } catch (error) {
+                    console.error('DeepSeek API 调用错误:', error);
+                    // 降级到本地回复逻辑
+                    return this.getLocalReply(message);
+                }
+            }
+            
+            getLocalReply(message) {
+                // 本地降级回复逻辑 - 更加生动有趣
+                const replies = {
+                    '你好': '你好呀！😊 我是你的智能微信机器人朋友，有什么可以帮你的吗？',
+                    '再见': '再见啦！期待下次和你聊天～ 有什么问题随时找我哦！👋',
+                    '天气': '今天天气看起来不错呢！☀️ 适合出门活动，记得做好防晒哦～',
+                    '时间': `现在是 ${new Date().toLocaleString('zh-CN')}，时间过得真快呀！`,
+                    '帮助': '我是一个由 DeepSeek 提供支持的智能微信机器人，可以陪你聊天、回答问题，还能讲笑话哦！你想聊点什么？',
+                    '你是谁': '我是你的智能微信机器人朋友，由 DeepSeek AI 驱动～ 我很聪明的，有什么问题都可以问我！',
+                    '笑话': '为什么程序员喜欢用黑暗模式？因为 light attracts bugs！😂',
+                    '开心': '看到你开心我也很开心！😄 有什么好玩的事要分享吗？',
+                    '难过': '别难过啦～ 😔 有什么烦心事可以和我聊聊，我会一直在这儿陪着你的。',
+                    '谢谢': '不客气！能帮到你我很开心～ 😊',
+                    '你好聪明': '谢谢夸奖！😊 我会继续努力变得更聪明的～'
+                };
+                
+                // 检查是否有匹配的回复
+                for (const [key, value] of Object.entries(replies)) {
+                    if (message.includes(key)) {
+                        return value;
+                    }
+                }
+                
+                // 默认回复 - 更加友好
+                const defaultReplies = [
+                    '哈哈，这个问题有点难倒我了～ 换个话题聊聊怎么样？',
+                    '抱歉，我暂时不太明白你的意思。你可以问我天气、时间，或者和我聊天哦！',
+                    '嗯... 让我想想... 不如我们聊点别的吧？',
+                    '这个问题好有趣！不过我现在还不太清楚答案，我们聊聊别的怎么样？',
+                    '哇，你的问题很有创意！不过我暂时还回答不了，我们换个话题吧～'
+                ];
+                
+                // 随机选择一个默认回复
+                return defaultReplies[Math.floor(Math.random() * defaultReplies.length)];
+            }
+        }
+        
+        // 初始化机器人
+        new WeChatBot();
+        
+        // 微信API接入说明
+        console.log('=== 微信机器人接入说明 ===');
+        console.log('1. 本项目提供了基础的聊天界面和逻辑');
+        console.log('2. 要接入真实微信，需要：');
+        console.log('   - 方案1：使用itchat库（Python）');
+        console.log('   - 方案2：使用wechaty库（Node.js）');
+        console.log('   - 方案3：使用企业微信API');
+        console.log('3. 具体实现请参考相关文档');
+    </script>
+</body>
+</html>
