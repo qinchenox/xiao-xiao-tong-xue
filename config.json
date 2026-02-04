@@ -1,0 +1,6 @@
+{
+  "deepSeekKey": "sk-1a9f7c3642e34f5688f4ec040333a368",
+  "difyApiUrl": "http://127.0.0.1/api/v1/chat/completions",
+  "difyApiKey": "app-sAaaT7wywPCld9J04cmGYDgr",
+  "modelName": "wechat-bot-ai"
+}

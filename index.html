@@ -168,6 +168,8 @@
             overflow-y: auto;
             background-color: #F5F5F5;
             background-image: url('data:image/svg+xml;charset=utf-8,%3Csvg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"%3E%3Cpath d="M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z" fill="%23c0c0c0" fill-opacity="0.1" fill-rule="evenodd"/%3E%3C/svg%3E');
+            display: flex;
+            flex-direction: column;
         }
         
         .wechat-body::-webkit-scrollbar {
@@ -188,25 +190,58 @@
             background: #a8a8a8;
         }
         
+        /* 消息容器 */
+        .message-container {
+            margin-bottom: 16px;
+            display: flex;
+            align-items: flex-end;
+        }
+        
+        .message-container.user {
+            justify-content: flex-start;
+        }
+        
+        .message-container.bot {
+            justify-content: flex-end;
+        }
+        
+        /* 头像样式 */
+        .message-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            margin: 0 8px;
+            background: linear-gradient(135deg, #f0f0f0 0%, #e0e0e0 100%);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .message-container.bot .message-avatar {
+            background: linear-gradient(135deg, #07C160 0%, #05AE53 100%);
+            color: white;
+        }
+        
+        /* 消息内容 */
         .message {
-            margin-bottom: 20px;
             max-width: 78%;
-            padding: 14px 18px;
-            border-radius: 20px;
+            padding: 12px 16px;
+            border-radius: 18px;
             position: relative;
             font-size: 15px;
             line-height: 1.45;
             word-wrap: break-word;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-            animation: messageSlide 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            animation: messageSlide 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
-            overflow: hidden;
         }
         
         @keyframes messageSlide {
             from {
                 opacity: 0;
-                transform: translateY(15px) scale(0.95);
+                transform: translateY(10px) scale(0.95);
             }
             to {
                 opacity: 1;
@@ -215,40 +250,47 @@
         }
         
         .message.user {
-            background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
-            align-self: flex-start;
-            border-bottom-left-radius: 8px;
-            border: 1px solid rgba(0,0,0,0.05);
+            background: white;
+            border-bottom-left-radius: 4px;
+            border: 1px solid #e5e5e5;
         }
         
         .message.bot {
-            background: linear-gradient(135deg, #95EC69 0%, #83e45a 100%);
-            align-self: flex-end;
-            margin-left: auto;
-            border-bottom-right-radius: 8px;
-            border: 1px solid rgba(0,0,0,0.05);
+            background: #95EC69;
+            border-bottom-right-radius: 4px;
         }
         
-        .message::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-        }
-        
-        .message.user::before {
-            background: linear-gradient(90deg, transparent, rgba(0,0,0,0.05), transparent);
-        }
-        
+        /* 消息时间 */
         .message-time {
             font-size: 11px;
             color: #999;
             margin-top: 6px;
-            text-align: right;
+            text-align: center;
             opacity: 0.8;
+            font-weight: normal;
+        }
+        
+        /* 消息状态 */
+        .message-status {
+            font-size: 10px;
+            color: #999;
+            margin-left: 6px;
+            opacity: 0.7;
+        }
+        
+        /* 系统消息 */
+        .system-message {
+            text-align: center;
+            margin: 16px 0;
+            padding: 4px 12px;
+            background: rgba(0,0,0,0.05);
+            border-radius: 12px;
+            font-size: 11px;
+            color: #666;
+            display: inline-block;
+            align-self: center;
+            margin-left: auto;
+            margin-right: auto;
         }
         
         .wechat-footer {
@@ -701,9 +743,11 @@
         </div>
         
         <div class="wechat-body" id="chat-body">
-            <div class="message bot">
-                你好！我是微信机器人，有什么可以帮助你的？
+            <div class="message-container bot">
+                <div class="message bot">你好！我是小小同学，有什么可以帮助你的？</div>
+                <div class="message-avatar">🤖</div>
             </div>
+            <div class="message-time">12:00</div>
         </div>
         
         <div class="wechat-tools" id="tools-panel">
@@ -746,7 +790,68 @@
                 this.messageInput = document.getElementById('message-input');
                 this.sendBtn = document.getElementById('send-btn');
                 
+                // 初始化配置
+                this.config = {
+                    apiUrl: window.location.origin,
+                    deepSeekKey: localStorage.getItem('deepSeekKey') || ''
+                };
+                
                 this.initEventListeners();
+                this.loadConfig();
+                this.loadConfigFromServer();
+            }
+            
+            loadConfig() {
+                // 从本地存储加载配置
+                const savedConfig = localStorage.getItem('wechatBotConfig');
+                if (savedConfig) {
+                    this.config = { ...this.config, ...JSON.parse(savedConfig) };
+                }
+            }
+            
+            async loadConfigFromServer() {
+                // 从服务器加载配置
+                try {
+                    const response = await fetch(`${this.config.apiUrl}/api/config`);
+                    if (response.ok) {
+                        const data = await response.json();
+                        if (data.success && data.config) {
+                            this.config = { ...this.config, ...data.config };
+                            this.saveConfig();
+                            console.log('从服务器加载配置成功:', this.config);
+                        }
+                    }
+                } catch (error) {
+                    console.error('从服务器加载配置失败:', error);
+                }
+            }
+            
+            async saveConfig() {
+                // 保存配置到本地存储
+                localStorage.setItem('wechatBotConfig', JSON.stringify(this.config));
+                localStorage.setItem('deepSeekKey', this.config.deepSeekKey);
+                
+                // 保存配置到服务器
+                try {
+                    const response = await fetch(`${this.config.apiUrl}/api/config`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            deepSeekKey: this.config.deepSeekKey
+                        })
+                    });
+                    
+                    if (response.ok) {
+                        const data = await response.json();
+                        if (data.success) {
+                            console.log('配置保存到服务器成功');
+                        }
+                    }
+                } catch (error) {
+                    console.error('保存配置到服务器失败:', error);
+                }
             }
             
             initEventListeners() {
@@ -818,7 +923,7 @@
                 
                 try {
                     // 调用后端工具 API
-                    const response = await fetch('http://localhost:3001/api/tools/call', {
+                    const response = await fetch(`${this.config.apiUrl}/api/tools/call`, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json'
@@ -883,6 +988,11 @@
             }
             
             addToolResult(toolName, data) {
+                // 创建消息容器
+                const containerDiv = document.createElement('div');
+                containerDiv.className = 'message-container bot';
+                
+                // 创建消息内容
                 const messageDiv = document.createElement('div');
                 messageDiv.className = 'message bot';
                 
@@ -923,7 +1033,27 @@
                 }
                 
                 messageDiv.innerHTML = toolResult;
-                this.chatBody.appendChild(messageDiv);
+                
+                // 创建头像
+                const avatarDiv = document.createElement('div');
+                avatarDiv.className = 'message-avatar';
+                avatarDiv.textContent = '🤖';
+                
+                // 创建时间显示
+                const timeDiv = document.createElement('div');
+                timeDiv.className = 'message-time';
+                timeDiv.textContent = new Date().toLocaleTimeString('zh-CN', { 
+                    hour: '2-digit', 
+                    minute: '2-digit' 
+                });
+                
+                // 组装结构
+                containerDiv.appendChild(messageDiv);
+                containerDiv.appendChild(avatarDiv);
+                
+                // 添加到聊天窗口
+                this.chatBody.appendChild(containerDiv);
+                this.chatBody.appendChild(timeDiv);
                 this.chatBody.scrollTop = this.chatBody.scrollHeight;
             }
             
@@ -1026,8 +1156,71 @@
             }
             
             showSettings() {
-                // 显示设置
-                alert('设置功能开发中，敬请期待！');
+                // 显示设置对话框
+                const settingsHtml = `
+                    <div style="padding: 20px; max-width: 400px;">
+                        <h3 style="margin-top: 0; color: #333;">机器人设置</h3>
+                        
+                        <div style="margin-bottom: 15px;">
+                            <label style="display: block; margin-bottom: 5px; color: #666;">DeepSeek API 密钥</label>
+                            <input type="password" id="deepSeekKey" value="${this.config.deepSeekKey}" 
+                                   style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                        </div>
+                        
+                        <div style="margin-bottom: 15px;">
+                            <label style="display: block; margin-bottom: 5px; color: #666;">API 地址</label>
+                            <input type="text" id="apiUrl" value="${this.config.apiUrl}" 
+                                   style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                        </div>
+                        
+                        <div style="margin-top: 20px; text-align: right;">
+                            <button id="saveConfig" style="padding: 8px 16px; background: #07C160; color: white; border: none; border-radius: 4px; cursor: pointer;">保存</button>
+                            <button id="cancelConfig" style="padding: 8px 16px; background: #999; color: white; border: none; border-radius: 4px; cursor: pointer; margin-left: 10px;">取消</button>
+                        </div>
+                    </div>
+                `;
+                
+                // 创建对话框
+                const dialog = document.createElement('div');
+                dialog.style.cssText = `
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    bottom: 0;
+                    background: rgba(0,0,0,0.5);
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    z-index: 1000;
+                `;
+                
+                const dialogContent = document.createElement('div');
+                dialogContent.style.cssText = `
+                    background: white;
+                    border-radius: 8px;
+                    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+                    max-width: 90%;
+                    max-height: 90%;
+                    overflow-y: auto;
+                `;
+                dialogContent.innerHTML = settingsHtml;
+                
+                dialog.appendChild(dialogContent);
+                document.body.appendChild(dialog);
+                
+                // 绑定事件
+                document.getElementById('saveConfig').addEventListener('click', () => {
+                    this.config.deepSeekKey = document.getElementById('deepSeekKey').value;
+                    this.config.apiUrl = document.getElementById('apiUrl').value;
+                    this.saveConfig();
+                    document.body.removeChild(dialog);
+                    alert('配置已保存！');
+                });
+                
+                document.getElementById('cancelConfig').addEventListener('click', () => {
+                    document.body.removeChild(dialog);
+                });
             }
             
             async sendMessage() {
@@ -1054,21 +1247,74 @@
             }
             
             addMessage(text, type) {
+                // 创建消息容器
+                const containerDiv = document.createElement('div');
+                containerDiv.className = `message-container ${type}`;
+                
+                // 创建头像
+                const avatarDiv = document.createElement('div');
+                avatarDiv.className = 'message-avatar';
+                avatarDiv.textContent = type === 'bot' ? '🤖' : '👤';
+                
+                // 创建消息内容
                 const messageDiv = document.createElement('div');
                 messageDiv.className = `message ${type}`;
-                messageDiv.textContent = text;
-                this.chatBody.appendChild(messageDiv);
+                
+                // 处理文本内容，支持基本的 HTML 格式
+                messageDiv.innerHTML = this.formatMessage(text);
+                
+                // 创建时间显示
+                const timeDiv = document.createElement('div');
+                timeDiv.className = 'message-time';
+                timeDiv.textContent = new Date().toLocaleTimeString('zh-CN', { 
+                    hour: '2-digit', 
+                    minute: '2-digit' 
+                });
+                
+                // 组装结构
+                if (type === 'user') {
+                    containerDiv.appendChild(avatarDiv);
+                    containerDiv.appendChild(messageDiv);
+                } else {
+                    containerDiv.appendChild(messageDiv);
+                    containerDiv.appendChild(avatarDiv);
+                }
+                
+                // 添加到聊天窗口
+                this.chatBody.appendChild(containerDiv);
+                this.chatBody.appendChild(timeDiv);
                 this.chatBody.scrollTop = this.chatBody.scrollHeight;
             }
             
+            formatMessage(text) {
+                // 简单的消息格式化，支持换行
+                return text.replace(/\n/g, '<br>');
+            }
+            
             addLoading() {
-                const loadingDiv = document.createElement('div');
-                loadingDiv.className = 'message bot';
-                loadingDiv.id = 'loading-' + Date.now();
-                loadingDiv.innerHTML = '<div class="typing-indicator"><span></span><span></span><span></span></div>';
-                this.chatBody.appendChild(loadingDiv);
+                // 创建消息容器
+                const containerDiv = document.createElement('div');
+                containerDiv.className = 'message-container bot';
+                containerDiv.id = 'loading-' + Date.now();
+                
+                // 创建消息内容
+                const messageDiv = document.createElement('div');
+                messageDiv.className = 'message bot';
+                messageDiv.innerHTML = '<div class="typing-indicator"><span></span><span></span><span></span></div>';
+                
+                // 创建头像
+                const avatarDiv = document.createElement('div');
+                avatarDiv.className = 'message-avatar';
+                avatarDiv.textContent = '🤖';
+                
+                // 组装结构
+                containerDiv.appendChild(messageDiv);
+                containerDiv.appendChild(avatarDiv);
+                
+                // 添加到聊天窗口
+                this.chatBody.appendChild(containerDiv);
                 this.chatBody.scrollTop = this.chatBody.scrollHeight;
-                return loadingDiv.id;
+                return containerDiv.id;
             }
             
             removeLoading(id) {
@@ -1081,11 +1327,15 @@
             async getReply(message) {
                 try {
                     // 直接调用 DeepSeek API 获取智能回复
+                    if (!this.config.deepSeekKey) {
+                        throw new Error('DeepSeek API 密钥未配置');
+                    }
+                    
                     const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
-                            'Authorization': 'Bearer sk-1a9f7c3642e34f5688f4ec040333a368'
+                            'Authorization': `Bearer ${this.config.deepSeekKey}`
                         },
                         body: JSON.stringify({
                             model: 'deepseek-chat',

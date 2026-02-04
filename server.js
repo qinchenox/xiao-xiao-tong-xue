@@ -5,10 +5,42 @@ const path = require('path');
 
 const PORT = 3001;
 
-// Dify API 配置
-const DIFY_API_URL = 'http://127.0.0.1/api/v1/chat/completions';
-const DIFY_API_KEY = 'app-sAaaT7wywPCld9J04cmGYDgr'; // 用户提供的 API 密钥
-const MODEL_NAME = 'wechat-bot-ai'; // AI 部署名称
+// API 配置管理
+
+// 配置文件路径
+const configPath = path.join(__dirname, 'config.json');
+
+// 加载配置
+let config = {
+    deepSeekKey: '',
+    difyApiUrl: 'http://127.0.0.1/api/v1/chat/completions',
+    difyApiKey: 'app-sAaaT7wywPCld9J04cmGYDgr',
+    modelName: 'wechat-bot-ai'
+};
+
+// 尝试从文件加载配置
+try {
+    if (fs.existsSync(configPath)) {
+        const configData = fs.readFileSync(configPath, 'utf8');
+        config = { ...config, ...JSON.parse(configData) };
+        console.log('配置加载成功:', config);
+    }
+} catch (error) {
+    console.error('加载配置文件失败:', error.message);
+}
+
+// 保存配置
+function saveConfig(newConfig) {
+    config = { ...config, ...newConfig };
+    try {
+        fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
+        console.log('配置保存成功');
+        return true;
+    } catch (error) {
+        console.error('保存配置文件失败:', error.message);
+        return false;
+    }
+}
 
 // 工具实现模块
 const tools = {
@@ -167,6 +199,41 @@ const server = http.createServer(async (req, res) => {
     // 健康检查端点
     if (pathname === '/api/health') {
         sendJSON(res, 200, { status: 'ok', message: '服务运行正常' });
+        return;
+    }
+
+    // 配置管理端点 - 获取配置
+    if (pathname === '/api/config' && req.method === 'GET') {
+        sendJSON(res, 200, {
+            success: true,
+            config: {
+                deepSeekKey: config.deepSeekKey,
+                apiUrl: `http://${req.headers.host}`
+            }
+        });
+        return;
+    }
+
+    // 配置管理端点 - 保存配置
+    if (pathname === '/api/config' && req.method === 'POST') {
+        try {
+            const body = await parseBody(req);
+            const { deepSeekKey } = body;
+            
+            if (deepSeekKey) {
+                const success = saveConfig({ deepSeekKey });
+                if (success) {
+                    sendJSON(res, 200, { success: true, message: '配置保存成功' });
+                } else {
+                    sendJSON(res, 500, { success: false, error: '配置保存失败' });
+                }
+            } else {
+                sendJSON(res, 400, { success: false, error: '配置参数不能为空' });
+            }
+        } catch (error) {
+            console.error('保存配置错误:', error);
+            sendJSON(res, 500, { success: false, error: error.message || '服务内部错误' });
+        }
         return;
     }
 
