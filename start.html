@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>寰俊鏈哄櫒浜哄惎鍔ㄩ〉</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif;
+            background-color: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-image: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            padding: 0;
+        }
+        
+        .container {
+            text-align: center;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 249, 250, 0.95) 100%);
+            padding: 50px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15), 0 0 0 1px rgba(255,255,255,0.1) inset;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .container:hover {
+            box-shadow: 0 15px 50px rgba(0,0,0,0.2), 0 0 0 1px rgba(255,255,255,0.1) inset;
+            transform: translateY(-2px);
+        }
+        
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            animation: shine 3s infinite;
+        }
+        
+        @keyframes shine {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+        
+        h1 {
+            color: #07C160;
+            margin-bottom: 25px;
+            font-size: 28px;
+            font-weight: 700;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        p {
+            color: #666;
+            margin-bottom: 35px;
+            font-size: 16px;
+            line-height: 1.5;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 16px 40px;
+            background: linear-gradient(135deg, #07C160 0%, #05AE53 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 30px;
+            font-size: 18px;
+            font-weight: 600;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 12px rgba(7, 193, 96, 0.4);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn:hover {
+            background: linear-gradient(135deg, #05AE53 0%, #049a48 100%);
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 6px 16px rgba(7, 193, 96, 0.5);
+        }
+        
+        .btn:active {
+            transform: translateY(0) scale(0.98);
+        }
+        
+        .tip {
+            margin-top: 30px;
+            font-size: 14px;
+            color: rgba(153, 153, 153, 0.8);
+            line-height: 1.4;
+        }
+        
+        .icon {
+            font-size: 60px;
+            margin-bottom: 20px;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.1);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+        
+        /* 绉诲姩绔搷搴斿紡璁捐 */
+        @media (max-width: 480px) {
+            body {
+                background-image: linear-gradient(135deg, #07C160 0%, #05AE53 100%);
+            }
+            
+            .container {
+                width: 90%;
+                padding: 30px 20px;
+                margin: 20px;
+            }
+            
+            h1 {
+                font-size: 24px;
+                margin-bottom: 20px;
+            }
+            
+            p {
+                font-size: 14px;
+                margin-bottom: 25px;
+            }
+            
+            .btn {
+                padding: 14px 30px;
+                font-size: 16px;
+            }
+            
+            .icon {
+                font-size: 48px;
+                margin-bottom: 15px;
+            }
+            
+            .tip {
+                margin-top: 20px;
+                font-size: 12px;
+            }
+        }
+        
+        /* 骞虫澘鍝嶅簲寮忚璁?*/
+        @media (min-width: 481px) and (max-width: 768px) {
+            .container {
+                width: 80%;
+                padding: 40px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="icon">馃</div>
+        <h1>灏忓皬鍚屽</h1>
+        <p>鐢?DeepSeek AI 鎻愪緵鏀寔锛屾櫤鑳姐€佸弸濂姐€侀珮鏁堢殑鑱婂ぉ鏈哄櫒浜?/p>
+        <a href="index.html" class="btn">寮€濮嬭亰澶?/a>
+        <div class="tip">
+            <p>馃挕 鎻愮ず锛氳繖鏄竴涓櫤鑳借亰澶╃晫闈紝闆嗘垚浜?DeepSeek AI 鏈嶅姟</p>
+            <p>馃敀 瀹夊叏锛氭偍鐨?API 瀵嗛挜宸插畨鍏ㄩ厤缃?/p>
+            <p>馃殌 楂樻晥锛氬揩閫熷搷搴旓紝鏅鸿兘鍥炲</p>
+        </div>
+    </div>
+</body>
+</html>
