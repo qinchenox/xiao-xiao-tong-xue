@@ -1,1 +1,1171 @@
-<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>小小同学</title></head><body><h1>欢迎使用小小同学智能聊天机器人</h1><p>这是一个测试页面</p></body></html>
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>寰俊鑱婂ぉ鏈哄櫒浜?/title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif;
+            background-color: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-image: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            padding: 0;
+        }
+        
+        .wechat-container {
+            width: 420px;
+            height: 680px;
+            background-color: #ffffff;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15), 0 0 0 1px rgba(255,255,255,0.1) inset;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+        
+        .wechat-container:hover {
+            box-shadow: 0 15px 50px rgba(0,0,0,0.2), 0 0 0 1px rgba(255,255,255,0.1) inset;
+            transform: translateY(-2px);
+        }
+        
+        .wechat-header {
+            background: linear-gradient(135deg, #07C160 0%, #05AE53 100%);
+            color: white;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .wechat-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            animation: shine 3s infinite;
+        }
+        
+        @keyframes shine {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+        
+        .wechat-header .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .wechat-header .bot-avatar {
+            font-size: 28px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .wechat-header .header-info {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        
+        .wechat-header h2 {
+            font-size: 18px;
+            font-weight: 600;
+            margin: 0;
+        }
+        
+        .wechat-header .status {
+            display: flex;
+            align-items: center;
+            font-size: 12px;
+            gap: 6px;
+        }
+        
+        .wechat-header .status-dot {
+            width: 8px;
+            height: 8px;
+            background-color: #FFFFFF;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+        
+        .wechat-header .header-right {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .wechat-header .header-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            border-radius: 8px;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .wechat-header .header-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        .wechat-header .header-btn:active {
+            transform: translateY(0);
+        }
+        
+        @keyframes pulse {
+            0% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 0.7;
+                transform: scale(1.1);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+        
+        .wechat-body {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background-color: #F5F5F5;
+            background-image: url('data:image/svg+xml;charset=utf-8,%3Csvg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"%3E%3Cpath d="M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z" fill="%23c0c0c0" fill-opacity="0.1" fill-rule="evenodd"/%3E%3C/svg%3E');
+        }
+        
+        .wechat-body::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .wechat-body::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 3px;
+        }
+        
+        .wechat-body::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 3px;
+        }
+        
+        .wechat-body::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+        
+        .message {
+            margin-bottom: 20px;
+            max-width: 78%;
+            padding: 14px 18px;
+            border-radius: 20px;
+            position: relative;
+            font-size: 15px;
+            line-height: 1.45;
+            word-wrap: break-word;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            animation: messageSlide 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        @keyframes messageSlide {
+            from {
+                opacity: 0;
+                transform: translateY(15px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+        
+        .message.user {
+            background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+            align-self: flex-start;
+            border-bottom-left-radius: 8px;
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+        
+        .message.bot {
+            background: linear-gradient(135deg, #95EC69 0%, #83e45a 100%);
+            align-self: flex-end;
+            margin-left: auto;
+            border-bottom-right-radius: 8px;
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+        
+        .message::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+        }
+        
+        .message.user::before {
+            background: linear-gradient(90deg, transparent, rgba(0,0,0,0.05), transparent);
+        }
+        
+        .message-time {
+            font-size: 11px;
+            color: #999;
+            margin-top: 6px;
+            text-align: right;
+            opacity: 0.8;
+        }
+        
+        .wechat-footer {
+            padding: 18px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+            border-top: 1px solid rgba(0,0,0,0.08);
+            display: flex;
+            align-items: center;
+            box-shadow: 0 -4px 16px rgba(0,0,0,0.05);
+            position: relative;
+        }
+        
+        .wechat-footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(0,0,0,0.08), transparent);
+        }
+        
+        .wechat-input {
+            flex: 1;
+            padding: 14px 18px;
+            border: 1px solid rgba(0,0,0,0.1);
+            border-radius: 24px;
+            outline: none;
+            margin-right: 14px;
+            font-size: 15px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: linear-gradient(135deg, #ffffff 0%, #f9f9f9 100%);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05) inset;
+        }
+        
+        .wechat-input:focus {
+            border-color: #07C160;
+            box-shadow: 0 0 0 3px rgba(7, 193, 96, 0.1), 0 2px 4px rgba(0,0,0,0.05) inset;
+            background: white;
+            transform: scale(1.01);
+        }
+        
+        .wechat-send {
+            background: linear-gradient(135deg, #07C160 0%, #05AE53 100%);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 48px;
+            height: 48px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 12px rgba(7, 193, 96, 0.4);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .wechat-send:hover {
+            background: linear-gradient(135deg, #05AE53 0%, #049a48 100%);
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 6px 16px rgba(7, 193, 96, 0.5);
+        }
+        
+        .wechat-send:active {
+            transform: translateY(0) scale(0.98);
+        }
+        
+        .wechat-send::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: shine 2s infinite;
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            border: 3px solid rgba(0,0,0,0.1);
+            border-radius: 50%;
+            border-top-color: #07C160;
+            animation: spin 1s ease-in-out infinite;
+            box-shadow: 0 0 10px rgba(7, 193, 96, 0.2);
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .welcome-message {
+            text-align: center;
+            margin: 25px 0;
+            padding: 20px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(248, 249, 250, 0.9) 100%);
+            border-radius: 16px;
+            font-size: 15px;
+            color: #666;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .typing-indicator {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 10px 15px;
+        }
+        
+        .typing-indicator span {
+            width: 10px;
+            height: 10px;
+            background: linear-gradient(135deg, #07C160 0%, #05AE53 100%);
+            border-radius: 50%;
+            animation: typing 1.4s infinite ease-in-out both;
+            box-shadow: 0 2px 4px rgba(7, 193, 96, 0.3);
+        }
+        
+        .typing-indicator span:nth-child(1) {
+            animation-delay: -0.32s;
+        }
+        
+        .typing-indicator span:nth-child(2) {
+            animation-delay: -0.16s;
+        }
+        
+        @keyframes typing {
+            0%, 80%, 100% {
+                transform: scale(0);
+                opacity: 0.5;
+            }
+            40% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+        
+        /* 娑堟伅鏃堕棿鏍峰紡浼樺寲 */
+        .message-time {
+            font-size: 11px;
+            color: rgba(153, 153, 153, 0.8);
+            margin-top: 8px;
+            text-align: right;
+            opacity: 0.8;
+            transition: opacity 0.3s ease;
+        }
+        
+        .message:hover .message-time {
+            opacity: 1;
+        }
+        
+        /* 婊氬姩鏉′紭鍖?*/
+        .wechat-body::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .wechat-body::-webkit-scrollbar-track {
+            background: rgba(0,0,0,0.05);
+            border-radius: 4px;
+        }
+        
+        .wechat-body::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #07C160 0%, #05AE53 100%);
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+        
+        .wechat-body::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, #05AE53 0%, #049a48 100%);
+            transform: scale(1.1);
+        }
+        
+        /* 绉诲姩绔搷搴斿紡璁捐 */
+        @media (max-width: 480px) {
+            body {
+                background-image: linear-gradient(135deg, #07C160 0%, #05AE53 100%);
+                overflow: hidden;
+            }
+            
+            .wechat-container {
+                width: 100%;
+                height: 100vh;
+                border-radius: 0;
+                box-shadow: none;
+            }
+            
+            .wechat-header {
+                padding: 15px;
+            }
+            
+            .wechat-header .bot-avatar {
+                font-size: 24px;
+                width: 36px;
+                height: 36px;
+            }
+            
+            .wechat-header h2 {
+                font-size: 16px;
+            }
+            
+            .wechat-header .header-btn {
+                width: 32px;
+                height: 32px;
+                font-size: 14px;
+            }
+            
+            .wechat-body {
+                padding: 12px;
+            }
+            
+            .message {
+                margin-bottom: 15px;
+                padding: 12px 14px;
+                font-size: 14px;
+            }
+            
+            .wechat-footer {
+                padding: 12px;
+            }
+            
+            .wechat-input {
+                padding: 12px 14px;
+                font-size: 14px;
+                margin-right: 10px;
+            }
+            
+            .wechat-send {
+                width: 42px;
+                height: 42px;
+                font-size: 16px;
+            }
+        }
+        
+        /* 骞虫澘鍝嶅簲寮忚璁?*/
+        @media (min-width: 481px) and (max-width: 768px) {
+            .wechat-container {
+                width: 90%;
+                height: 85vh;
+            }
+        }
+        
+        /* 瑙︽懜璁惧浼樺寲 */
+        @media (hover: none) and (pointer: coarse) {
+            .wechat-header .header-btn:hover {
+                background: rgba(255, 255, 255, 0.2);
+                transform: none;
+                box-shadow: none;
+            }
+            
+            .wechat-header .header-btn:active {
+                background: rgba(255, 255, 255, 0.3);
+                transform: scale(0.95);
+            }
+            
+            .wechat-send:hover {
+                transform: none;
+            }
+            
+            .wechat-send:active {
+                transform: scale(0.95);
+            }
+        }
+        
+        /* 宸ュ叿闈㈡澘鏍峰紡 */
+        .wechat-tools {
+            background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+            border-top: 1px solid rgba(0,0,0,0.08);
+            border-bottom: 1px solid rgba(0,0,0,0.08);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+        
+        .wechat-tools::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(0,0,0,0.08), transparent);
+        }
+        
+        .tools-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .tools-header:hover {
+            background: rgba(0,0,0,0.02);
+        }
+        
+        .tools-header h3 {
+            font-size: 14px;
+            font-weight: 600;
+            color: #666;
+            margin: 0;
+        }
+        
+        .tools-toggle {
+            background: none;
+            border: none;
+            font-size: 12px;
+            color: #999;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            padding: 4px;
+            border-radius: 4px;
+        }
+        
+        .tools-toggle:hover {
+            background: rgba(0,0,0,0.05);
+            color: #666;
+        }
+        
+        .tools-content {
+            padding: 10px 15px;
+            max-height: 200px;
+            overflow-y: auto;
+            animation: slideDown 0.3s ease-out;
+        }
+        
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                max-height: 0;
+            }
+            to {
+                opacity: 1;
+                max-height: 200px;
+            }
+        }
+        
+        .tool-category {
+            margin-bottom: 15px;
+        }
+        
+        .tool-category h4 {
+            font-size: 12px;
+            font-weight: 600;
+            color: #999;
+            margin: 0 0 8px 0;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .tool-btn {
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            border: 1px solid rgba(0,0,0,0.1);
+            border-radius: 8px;
+            padding: 8px 12px;
+            margin-right: 8px;
+            margin-bottom: 8px;
+            font-size: 12px;
+            color: #666;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        
+        .tool-btn:hover {
+            background: linear-gradient(135deg, #07C160 0%, #05AE53 100%);
+            color: white;
+            border-color: #07C160;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(7, 193, 96, 0.3);
+        }
+        
+        .tool-btn:active {
+            transform: translateY(0);
+        }
+        
+        /* 宸ュ叿缁撴灉鏄剧ず鏍峰紡 */
+        .tool-result {
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            border: 1px solid #bae6fd;
+            border-radius: 12px;
+            padding: 12px;
+            margin-top: 8px;
+            font-size: 13px;
+            line-height: 1.4;
+            color: #0369a1;
+            box-shadow: 0 2px 4px rgba(59, 130, 246, 0.1);
+        }
+        
+        .tool-result h5 {
+            font-size: 12px;
+            font-weight: 600;
+            margin: 0 0 8px 0;
+            color: #0284c7;
+        }
+        
+        .tool-result pre {
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 6px;
+            padding: 8px;
+            font-size: 11px;
+            overflow-x: auto;
+            margin: 8px 0 0 0;
+        }
+        
+        /* 宸ュ叿闈㈡澘鍝嶅簲寮忚璁?*/
+        @media (max-width: 480px) {
+            .wechat-tools {
+                order: 2;
+            }
+            
+            .tools-content {
+                max-height: 150px;
+                padding: 8px 12px;
+            }
+            
+            .tool-btn {
+                padding: 6px 10px;
+                font-size: 11px;
+                margin-right: 6px;
+                margin-bottom: 6px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="wechat-container">
+        <div class="wechat-header">
+            <div class="header-left">
+                <div class="bot-avatar">馃</div>
+                <div class="header-info">
+                    <h2>灏忓皬鍚屽</h2>
+                    <div class="status">
+                        <div class="status-dot"></div>
+                        <span>鍦ㄧ嚎</span>
+                    </div>
+                </div>
+            </div>
+            <div class="header-right">
+                <button class="header-btn" title="鍘嗗彶璁板綍">馃搵</button>
+                <button class="header-btn" title="鏂板璇濇">鉃?/button>
+                <button class="header-btn" title="璁剧疆">鈿欙笍</button>
+            </div>
+        </div>
+        
+        <div class="wechat-body" id="chat-body">
+            <div class="message bot">
+                浣犲ソ锛佹垜鏄井淇℃満鍣ㄤ汉锛屾湁浠€涔堝彲浠ュ府鍔╀綘鐨勶紵
+            </div>
+        </div>
+        
+        <div class="wechat-tools" id="tools-panel">
+            <div class="tools-header">
+                <h3>宸ュ叿</h3>
+                <button class="tools-toggle" id="tools-toggle">鈻?/button>
+            </div>
+            <div class="tools-content" id="tools-content">
+                <div class="tool-category">
+                    <h4>鈴?鏃堕棿宸ュ叿</h4>
+                    <button class="tool-btn" data-tool="current_time">鑾峰彇褰撳墠鏃堕棿</button>
+                    <button class="tool-btn" data-tool="timezone_conversion">鏃跺尯杞崲</button>
+                    <button class="tool-btn" data-tool="weekday">鏄熸湡鍑犺绠?/button>
+                    <button class="tool-btn" data-tool="timestamp_conversion">鏃堕棿鎴宠浆鎹?/button>
+                </div>
+                <div class="tool-category">
+                    <h4>馃搵 GitHub 宸ュ叿</h4>
+                    <button class="tool-btn" data-tool="github_repos">浠撳簱鎼滅储</button>
+                    <button class="tool-btn" data-tool="github_issues">Issues 绠＄悊</button>
+                </div>
+                <div class="tool-category">
+                    <h4>馃寪 缃戦〉宸ュ叿</h4>
+                    <button class="tool-btn" data-tool="webscraper">缃戦〉鐖櫕</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="wechat-footer">
+            <input type="text" class="wechat-input" id="message-input" placeholder="杈撳叆娑堟伅...">
+            <button class="wechat-send" id="send-btn">鍙戦€?/button>
+        </div>
+    </div>
+    
+    <script>
+        // 寰俊鏈哄櫒浜烘牳蹇冮€昏緫
+        class WeChatBot {
+            constructor() {
+                this.messages = [];
+                this.chatBody = document.getElementById('chat-body');
+                this.messageInput = document.getElementById('message-input');
+                this.sendBtn = document.getElementById('send-btn');
+                
+                this.initEventListeners();
+            }
+            
+            initEventListeners() {
+                // 鍙戦€佹寜閽偣鍑讳簨浠?
+                this.sendBtn.addEventListener('click', () => {
+                    this.sendMessage();
+                });
+                
+                // 杈撳叆妗嗗洖杞︿簨浠?
+                this.messageInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        this.sendMessage();
+                    }
+                });
+                
+                // 澶撮儴鎸夐挳浜嬩欢
+                const historyBtn = document.querySelector('[title="鍘嗗彶璁板綍"]');
+                const newChatBtn = document.querySelector('[title="鏂板璇濇"]');
+                const settingsBtn = document.querySelector('[title="璁剧疆"]');
+                
+                if (historyBtn) {
+                    historyBtn.addEventListener('click', () => {
+                        this.showHistory();
+                    });
+                }
+                
+                if (newChatBtn) {
+                    newChatBtn.addEventListener('click', () => {
+                        this.newChat();
+                    });
+                }
+                
+                if (settingsBtn) {
+                    settingsBtn.addEventListener('click', () => {
+                        this.showSettings();
+                    });
+                }
+                
+                // 宸ュ叿闈㈡澘浜嬩欢
+                const toolsToggle = document.getElementById('tools-toggle');
+                const toolsContent = document.getElementById('tools-content');
+                
+                if (toolsToggle && toolsContent) {
+                    toolsToggle.addEventListener('click', () => {
+                        const isVisible = toolsContent.style.display !== 'none';
+                        if (isVisible) {
+                            toolsContent.style.display = 'none';
+                            toolsToggle.textContent = '鈻?;
+                        } else {
+                            toolsContent.style.display = 'block';
+                            toolsToggle.textContent = '鈻?;
+                        }
+                    });
+                }
+                
+                // 宸ュ叿鎸夐挳浜嬩欢
+                const toolBtns = document.querySelectorAll('.tool-btn');
+                toolBtns.forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const toolName = btn.dataset.tool;
+                        this.useTool(toolName);
+                    });
+                });
+            }
+            
+            async useTool(toolName) {
+                // 鏄剧ず鍔犺浇鐘舵€?
+                const loadingId = this.addLoading();
+                
+                try {
+                    // 璋冪敤鍚庣宸ュ叿 API
+                    const response = await fetch('http://localhost:3001/api/tools/call', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            tool_name: toolName,
+                            params: {}
+                        })
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error('API 璋冪敤澶辫触');
+                    }
+                    
+                    const result = await response.json();
+                    this.removeLoading(loadingId);
+                    
+                    if (result.success) {
+                        // 鏄剧ず宸ュ叿璋冪敤缁撴灉
+                        this.addToolResult(toolName, result.data);
+                    } else {
+                        this.addMessage(`宸ュ叿璋冪敤澶辫触: ${result.error}`, 'bot');
+                    }
+                } catch (error) {
+                    console.error('宸ュ叿璋冪敤閿欒:', error);
+                    this.removeLoading(loadingId);
+                    
+                    // 闄嶇骇鍒版湰鍦板伐鍏峰疄鐜?
+                    const localResult = await this.getLocalToolResult(toolName);
+                    if (localResult.success) {
+                        this.addToolResult(toolName, localResult.data);
+                    } else {
+                        this.addMessage(`宸ュ叿璋冪敤閿欒: ${error.message}`, 'bot');
+                    }
+                }
+            }
+            
+            // 鏈湴宸ュ叿瀹炵幇锛堥檷绾т娇鐢級
+            async getLocalToolResult(toolName) {
+                try {
+                    switch (toolName) {
+                        case 'current_time':
+                            return await this.getCurrentTime();
+                        case 'timezone_conversion':
+                            return await this.getTimezoneConversion();
+                        case 'weekday':
+                            return await this.getWeekday();
+                        case 'timestamp_conversion':
+                            return await this.getTimestampConversion();
+                        case 'github_repos':
+                            return await this.getGitHubRepos();
+                        case 'github_issues':
+                            return await this.getGitHubIssues();
+                        case 'webscraper':
+                            return await this.getWebScraper();
+                        default:
+                            return { success: false, error: '宸ュ叿鏈疄鐜? };
+                    }
+                } catch (error) {
+                    return { success: false, error: error.message };
+                }
+            }
+            
+            addToolResult(toolName, data) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = 'message bot';
+                
+                let toolLabel, toolResult;
+                
+                switch (toolName) {
+                    case 'current_time':
+                        toolLabel = '鈴?褰撳墠鏃堕棿';
+                        toolResult = `<div class="tool-result"><h5>${toolLabel}</h5><p>${data}</p></div>`;
+                        break;
+                    case 'timezone_conversion':
+                        toolLabel = '馃實 鏃跺尯杞崲';
+                        toolResult = `<div class="tool-result"><h5>${toolLabel}</h5><p>${data}</p></div>`;
+                        break;
+                    case 'weekday':
+                        toolLabel = '馃搮 鏄熸湡鍑犺绠?;
+                        toolResult = `<div class="tool-result"><h5>${toolLabel}</h5><p>${data}</p></div>`;
+                        break;
+                    case 'timestamp_conversion':
+                        toolLabel = '鈴憋笍 鏃堕棿鎴宠浆鎹?;
+                        toolResult = `<div class="tool-result"><h5>${toolLabel}</h5><p>${data}</p></div>`;
+                        break;
+                    case 'github_repos':
+                        toolLabel = '馃搵 GitHub 浠撳簱';
+                        toolResult = `<div class="tool-result"><h5>${toolLabel}</h5><pre>${data}</pre></div>`;
+                        break;
+                    case 'github_issues':
+                        toolLabel = '馃悰 GitHub Issues';
+                        toolResult = `<div class="tool-result"><h5>${toolLabel}</h5><pre>${data}</pre></div>`;
+                        break;
+                    case 'webscraper':
+                        toolLabel = '馃寪 缃戦〉鍐呭';
+                        toolResult = `<div class="tool-result"><h5>${toolLabel}</h5><pre>${data}</pre></div>`;
+                        break;
+                    default:
+                        toolLabel = '宸ュ叿缁撴灉';
+                        toolResult = `<div class="tool-result"><h5>${toolLabel}</h5><p>${data}</p></div>`;
+                }
+                
+                messageDiv.innerHTML = toolResult;
+                this.chatBody.appendChild(messageDiv);
+                this.chatBody.scrollTop = this.chatBody.scrollHeight;
+            }
+            
+            // 鏃堕棿宸ュ叿瀹炵幇
+            async getCurrentTime() {
+                try {
+                    const now = new Date();
+                    const formattedTime = now.toLocaleString('zh-CN', {
+                        year: 'numeric',
+                        month: '2-digit',
+                        day: '2-digit',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        second: '2-digit',
+                        hour12: false
+                    });
+                    return { success: true, data: formattedTime };
+                } catch (error) {
+                    return { success: false, error: error.message };
+                }
+            }
+            
+            async getTimezoneConversion() {
+                try {
+                    const now = new Date();
+                    const localTime = now.toLocaleString('zh-CN');
+                    const utcTime = now.toUTCString();
+                    return { success: true, data: `鏈湴鏃堕棿: ${localTime}\nUTC鏃堕棿: ${utcTime}` };
+                } catch (error) {
+                    return { success: false, error: error.message };
+                }
+            }
+            
+            async getWeekday() {
+                try {
+                    const now = new Date();
+                    const weekdays = ['鏄熸湡鏃?, '鏄熸湡涓€', '鏄熸湡浜?, '鏄熸湡涓?, '鏄熸湡鍥?, '鏄熸湡浜?, '鏄熸湡鍏?];
+                    const weekday = weekdays[now.getDay()];
+                    const date = now.toLocaleDateString('zh-CN');
+                    return { success: true, data: `${date} ${weekday}` };
+                } catch (error) {
+                    return { success: false, error: error.message };
+                }
+            }
+            
+            async getTimestampConversion() {
+                try {
+                    const now = new Date();
+                    const timestamp = now.getTime();
+                    const date = now.toLocaleString('zh-CN');
+                    return { success: true, data: `褰撳墠鏃堕棿: ${date}\n鏃堕棿鎴? ${timestamp}` };
+                } catch (error) {
+                    return { success: false, error: error.message };
+                }
+            }
+            
+            // GitHub 宸ュ叿瀹炵幇锛堟ā鎷燂級
+            async getGitHubRepos() {
+                try {
+                    return { success: true, data: 'GitHub 浠撳簱鎼滅储鍔熻兘寮€鍙戜腑...' };
+                } catch (error) {
+                    return { success: false, error: error.message };
+                }
+            }
+            
+            async getGitHubIssues() {
+                try {
+                    return { success: true, data: 'GitHub Issues 鍔熻兘寮€鍙戜腑...' };
+                } catch (error) {
+                    return { success: false, error: error.message };
+                }
+            }
+            
+            // 缃戦〉鐖櫕瀹炵幇锛堟ā鎷燂級
+            async getWebScraper() {
+                try {
+                    return { success: true, data: '缃戦〉鐖櫕鍔熻兘寮€鍙戜腑...' };
+                } catch (error) {
+                    return { success: false, error: error.message };
+                }
+            }
+            
+            showHistory() {
+                // 鏄剧ず鍘嗗彶璁板綍
+                alert('鍘嗗彶璁板綍鍔熻兘寮€鍙戜腑锛屾暚璇锋湡寰咃紒');
+            }
+            
+            newChat() {
+                // 鏂板璇濇
+                if (confirm('纭畾瑕佸紑濮嬫柊鐨勫璇濆悧锛熷綋鍓嶅璇濆唴瀹瑰皢浼氳娓呯┖銆?)) {
+                    this.clearChat();
+                    this.addMessage('浣犲ソ锛佹垜鏄櫤鑳藉井淇℃満鍣ㄤ汉锛屾湁浠€涔堝彲浠ュ府鍔╀綘鐨勶紵', 'bot');
+                }
+            }
+            
+            clearChat() {
+                // 娓呯┖鑱婂ぉ璁板綍
+                this.chatBody.innerHTML = '';
+                this.messages = [];
+            }
+            
+            showSettings() {
+                // 鏄剧ず璁剧疆
+                alert('璁剧疆鍔熻兘寮€鍙戜腑锛屾暚璇锋湡寰咃紒');
+            }
+            
+            async sendMessage() {
+                const message = this.messageInput.value.trim();
+                if (!message) return;
+                
+                // 娣诲姞鐢ㄦ埛娑堟伅
+                this.addMessage(message, 'user');
+                this.messageInput.value = '';
+                
+                // 妯℃嫙鏈哄櫒浜烘€濊€?
+                const loadingId = this.addLoading();
+                
+                try {
+                    // 璋冪敤鏅鸿兘鍥炲
+                    const reply = await this.getReply(message);
+                    this.removeLoading(loadingId);
+                    this.addMessage(reply, 'bot');
+                } catch (error) {
+                    console.error('鍙戦€佹秷鎭敊璇?', error);
+                    this.removeLoading(loadingId);
+                    this.addMessage('鎶辨瓑锛屾垜鏆傛椂鏃犳硶鍥炲浣犵殑娑堟伅锛岃绋嶅悗鍐嶈瘯銆?, 'bot');
+                }
+            }
+            
+            addMessage(text, type) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message ${type}`;
+                messageDiv.textContent = text;
+                this.chatBody.appendChild(messageDiv);
+                this.chatBody.scrollTop = this.chatBody.scrollHeight;
+            }
+            
+            addLoading() {
+                const loadingDiv = document.createElement('div');
+                loadingDiv.className = 'message bot';
+                loadingDiv.id = 'loading-' + Date.now();
+                loadingDiv.innerHTML = '<div class="typing-indicator"><span></span><span></span><span></span></div>';
+                this.chatBody.appendChild(loadingDiv);
+                this.chatBody.scrollTop = this.chatBody.scrollHeight;
+                return loadingDiv.id;
+            }
+            
+            removeLoading(id) {
+                const loadingDiv = document.getElementById(id);
+                if (loadingDiv) {
+                    loadingDiv.remove();
+                }
+            }
+            
+            async getReply(message) {
+                try {
+                    // 鐩存帴璋冪敤 DeepSeek API 鑾峰彇鏅鸿兘鍥炲
+                    const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': 'Bearer sk-1a9f7c3642e34f5688f4ec040333a368'
+                        },
+                        body: JSON.stringify({
+                            model: 'deepseek-chat',
+                            messages: [
+                                {
+                                    role: 'system',
+                                    content: '浣犳槸涓€涓櫤鑳藉井淇℃満鍣ㄤ汉锛屽弸濂姐€佸菇榛樸€佷箰浜庡姪浜恒€傝鐢ㄨ嚜鐒剁殑涓枃鍥炲鐢ㄦ埛鐨勯棶棰橈紝淇濇寔瀵硅瘽娴佺晠鏈夎叮銆?
+                                },
+                                {
+                                    role: 'user',
+                                    content: message
+                                }
+                            ],
+                            temperature: 0.7,
+                            max_tokens: 1000,
+                            stream: false
+                        })
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error('API 璋冪敤澶辫触');
+                    }
+                    
+                    const data = await response.json();
+                    return data.choices[0].message.content || '鎶辨瓑锛屾垜鏆傛椂鏃犳硶鍥炵瓟杩欎釜闂銆?;
+                } catch (error) {
+                    console.error('DeepSeek API 璋冪敤閿欒:', error);
+                    // 闄嶇骇鍒版湰鍦板洖澶嶉€昏緫
+                    return this.getLocalReply(message);
+                }
+            }
+            
+            getLocalReply(message) {
+                // 鏈湴闄嶇骇鍥炲閫昏緫 - 鏇村姞鐢熷姩鏈夎叮
+                const replies = {
+                    '浣犲ソ': '浣犲ソ鍛€锛侌煒?鎴戞槸浣犵殑鏅鸿兘寰俊鏈哄櫒浜烘湅鍙嬶紝鏈変粈涔堝彲浠ュ府浣犵殑鍚楋紵',
+                    '鍐嶈': '鍐嶈鍟︼紒鏈熷緟涓嬫鍜屼綘鑱婂ぉ锝?鏈変粈涔堥棶棰橀殢鏃舵壘鎴戝摝锛侌煈?,
+                    '澶╂皵': '浠婂ぉ澶╂皵鐪嬭捣鏉ヤ笉閿欏憿锛佲榾锔?閫傚悎鍑洪棬娲诲姩锛岃寰楀仛濂介槻鏅掑摝锝?,
+                    '鏃堕棿': `鐜板湪鏄?${new Date().toLocaleString('zh-CN')}锛屾椂闂磋繃寰楃湡蹇憖锛乣,
+                    '甯姪': '鎴戞槸涓€涓敱 DeepSeek 鎻愪緵鏀寔鐨勬櫤鑳藉井淇℃満鍣ㄤ汉锛屽彲浠ラ櫔浣犺亰澶┿€佸洖绛旈棶棰橈紝杩樿兘璁茬瑧璇濆摝锛佷綘鎯宠亰鐐逛粈涔堬紵',
+                    '浣犳槸璋?: '鎴戞槸浣犵殑鏅鸿兘寰俊鏈哄櫒浜烘湅鍙嬶紝鐢?DeepSeek AI 椹卞姩锝?鎴戝緢鑱槑鐨勶紝鏈変粈涔堥棶棰橀兘鍙互闂垜锛?,
+                    '绗戣瘽': '涓轰粈涔堢▼搴忓憳鍠滄鐢ㄩ粦鏆楁ā寮忥紵鍥犱负 light attracts bugs锛侌煒?,
+                    '寮€蹇?: '鐪嬪埌浣犲紑蹇冩垜涔熷緢寮€蹇冿紒馃槃 鏈変粈涔堝ソ鐜╃殑浜嬭鍒嗕韩鍚楋紵',
+                    '闅捐繃': '鍒毦杩囧暒锝?馃様 鏈変粈涔堢儲蹇冧簨鍙互鍜屾垜鑱婅亰锛屾垜浼氫竴鐩村湪杩欏効闄潃浣犵殑銆?,
+                    '璋㈣阿': '涓嶅姘旓紒鑳藉府鍒颁綘鎴戝緢寮€蹇冿綖 馃槉',
+                    '浣犲ソ鑱槑': '璋㈣阿澶稿锛侌煒?鎴戜細缁х画鍔姏鍙樺緱鏇磋仾鏄庣殑锝?
+                };
+                
+                // 妫€鏌ユ槸鍚︽湁鍖归厤鐨勫洖澶?
+                for (const [key, value] of Object.entries(replies)) {
+                    if (message.includes(key)) {
+                        return value;
+                    }
+                }
+                
+                // 榛樿鍥炲 - 鏇村姞鍙嬪ソ
+                const defaultReplies = [
+                    '鍝堝搱锛岃繖涓棶棰樻湁鐐归毦鍊掓垜浜嗭綖 鎹釜璇濋鑱婅亰鎬庝箞鏍凤紵',
+                    '鎶辨瓑锛屾垜鏆傛椂涓嶅お鏄庣櫧浣犵殑鎰忔€濄€備綘鍙互闂垜澶╂皵銆佹椂闂达紝鎴栬€呭拰鎴戣亰澶╁摝锛?,
+                    '鍡?.. 璁╂垜鎯虫兂... 涓嶅鎴戜滑鑱婄偣鍒殑鍚э紵',
+                    '杩欎釜闂濂芥湁瓒ｏ紒涓嶈繃鎴戠幇鍦ㄨ繕涓嶅お娓呮绛旀锛屾垜浠亰鑱婂埆鐨勬€庝箞鏍凤紵',
+                    '鍝囷紝浣犵殑闂寰堟湁鍒涙剰锛佷笉杩囨垜鏆傛椂杩樺洖绛斾笉浜嗭紝鎴戜滑鎹釜璇濋鍚э綖'
+                ];
+                
+                // 闅忔満閫夋嫨涓€涓粯璁ゅ洖澶?
+                return defaultReplies[Math.floor(Math.random() * defaultReplies.length)];
+            }
+        }
+        
+        // 鍒濆鍖栨満鍣ㄤ汉
+        new WeChatBot();
+        
+        // 寰俊API鎺ュ叆璇存槑
+        console.log('=== 寰俊鏈哄櫒浜烘帴鍏ヨ鏄?===');
+        console.log('1. 鏈」鐩彁渚涗簡鍩虹鐨勮亰澶╃晫闈㈠拰閫昏緫');
+        console.log('2. 瑕佹帴鍏ョ湡瀹炲井淇★紝闇€瑕侊細');
+        console.log('   - 鏂规1锛氫娇鐢╥tchat搴擄紙Python锛?);
+        console.log('   - 鏂规2锛氫娇鐢╳echaty搴擄紙Node.js锛?);
+        console.log('   - 鏂规3锛氫娇鐢ㄤ紒涓氬井淇PI');
+        console.log('3. 鍏蜂綋瀹炵幇璇峰弬鑰冪浉鍏虫枃妗?);
+    </script>
+</body>
+</html>
